@@ -40,7 +40,10 @@ Records* initRecords(Graph* graph, int startVertex) {
   }
 
   newRecords->numVertices = graph->numVertices;
-  newRecords
+  MinHeap* newMinHeap = initHeap(graph, startVertex);
+  newRecords->heap = newMinHeap;
+  newRecords->finished = false;
+  
 };
 
 /* Creates, populates, and returns a MinHeap to be used by Prim's and
@@ -61,12 +64,15 @@ MinHeap* initHeap(Graph* graph, int startVertex) {
     if (graph->vertices[i] == NULL)
       continue;
       
-    if (i == startVertex) {
+    // Get the actual vertex ID
+    int vertexId = graph->vertices[i]->id;
+      
+    if (vertexId == startVertex) {
       // Start vertex gets priority 0
-      insert(minHeap, 0, i);
+      insert(minHeap, 0, vertexId);
     } else {
       // All other vertices get "infinity" priority
-      insert(minHeap, INF, i);
+      insert(minHeap, INF, vertexId);
     }
   }
   
@@ -83,7 +89,19 @@ void printRecords(Records* records);
 
 /* Add a new edge to records at index ind. */
 void addTreeEdge(Records* records, int ind, int fromVertex, int toVertex,
-                 int weight);
+                 int weight) {
+                  Edge* newEdge = (Edge*)malloc(sizeof(Edge));
+
+                  if (newEdge == NULL) {
+                    printf("Error: Memory allocation failed for new EDGE\n");
+                    exit(1);
+                  }
+
+                  newEdge->fromVertex = fromVertex;
+                  newEdge->toVertex = toVertex;
+                  newEdge->weight = weight;
+                  records->tree[ind] = newEdge;
+                 };
 
 /* Creates and returns a path from 'vertex' to 'startVertex' from edges
  * in the distance tree 'distTree'.
